@@ -1,0 +1,326 @@
+<!------------------------------------------------------------------------------------------------------------------------
+Kostenlose und frei nutzbares EMDR-Werkzeug
+--------------------------------------------------------------------------------------------------------------------------
+
+Diese Software darf ausdrücklich von allen kostenfrei und auch im kommerziellen Kontex verwendet werden. Sie kann offline oder online verwendet werden.
+
+Es handelt sich um eine HTML-Datei, die in jedem Browser verwendet werden kann und keine weiteren Ressourcen benötigt.
+
+Ich habe diese Software für meine Frau Iris Gothe an einem Wochende geschrieben.
+
+Autor: Klaus Gero Gothe
+Version: 1.0 / 2023-01
+
+--------------------------------------------------------------------------------------------------------------------------
+
+Lizenzinformation
+
+The MIT License (MIT)
+
+Copyright (c) 2023 Gero Gothe
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+-------------------------------------------------------------------------------------------------------------------------->
+
+<html>
+	<style>
+		html, body { margin: 0;overflow: hidden;}
+
+		body {background:lightsteelblue;font-family: Arial, Helvetica, sans-serif;}
+
+		.button {box-shadow:inset 0px 1px 0px 0px #ffffff;background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);background-color:#ffffff;border-radius:6px;border:1px solid #dcdcdc;display:inline-block;cursor:pointer;color:#666666;font-family:Arial;font-size:1em;padding:6px 24px;text-decoration:none;text-shadow:0px 1px 0px #ffffff;position:fixed;bottom:40px;right:10px;}
+
+		.option {border: 1px solid gray;width: 200px;margin: 0 auto 1em;padding: 0.5em;border-radius: 10px;text-align: center;margin-bottom: 1em;margin-right: 0;background: white;}
+
+		.steuerung {position: fixed;width: 300px;bottom: 100px;right: 10px;text-align:right;display:block;}
+		
+		.fullscreenBtn {position:fixed;top:10px;right:10px;padding:1px:font-size:1em;font-weight:bold;color:gray;border:1px solid gray;width:1.2em;text-align:center;cursor:pointer;background-color:white}
+		
+		.mode input[type="radio"] {
+			clip: rect(0 0 0 0);
+			clip-path: inset(50%);
+			height: 1px;
+			overflow: hidden;
+			position: absolute;
+			white-space: nowrap;
+			width: 10px;
+		}
+
+		.mode label {
+			border: 1px solid #333;
+			padding: 1px;
+		}
+ 
+		.mode input:checked + label {
+			background: #ebf5d7;
+			color: #5a9900;
+			box-shadow: none;
+		}
+
+		 input:hover + label,
+		 input:focus + label {
+			background: #ffebe6; 
+		}
+	</style>
+	<body >
+		
+		<!-----------------------
+		    Einstellungsmenü 
+		------------------------>
+		<div class="steuerung" id="steuerung" style="right:10px;"> <!-- Der "right" Wert muss hier definiert werden, weil sonst nicht von JS lesbar, was für den toggle notwendig ist -->
+
+			<div class="option">
+				Wiederholungen: <span id="amountVal">10</span><br><input type="range" min="10" max="50" step="1.0" value="10" id="amount" oninput="changeVal()">
+			</div>
+			
+			<div class="option">
+				Geschwindigkeit: <span id="speedVal">1</span> Hz<br><input type="range" min="1" max="20" step="1.0" value="10" id="speed" oninput="changeVal()">
+			</div>
+			
+			<div class="option">
+				Radius: <span id="radiusVal">20</span> px<br><input type="range" min="10" max="40" step="1.0" value="20" id="radius" oninput="changeVal()">
+			</div>
+			
+			<div class="option">
+				Farbe: <input type="color" value="#f542a7" id="dotcolor" oninput="changeVal()" style="height:20px">
+			</div>
+			
+			<div class="option">
+				Hintergrund: <input type="color" value="#a1ecff" id="bgcolor" oninput="changeVal()" style="height:20px">
+			</div>
+			
+			<div class="option mode" onclick="getMode()"> Richtung:
+				<input type="radio" id="m1" name="mode" value="horizontal"><label for="m1">&#8596;</label>
+				<input type="radio" id="m2" name="mode" value="vertical"><label for="m2">&varr;</label>
+				<input type="radio" id="m3" name="mode" value="diagonal"><label for="m3">&#8601;</label>				
+			</div>
+			
+		</div>
+		
+		<!-- Einstellungsbutton -->
+		<div class="button" onclick="toggleSettings();">
+			Einstellungen
+		</div>
+		
+		<!-- Vollbild-Button -->
+		<div class="fullscreenBtn" onclick="FullScreen()">
+			&#10530;
+		</div>
+
+
+		<!------------------------- 
+		Zeichenfläche 
+		Diese ist in einem Div verpackt, welches die komplette Bildfläche einnimmt, damit man überall hinklicken kan
+		--------------------------->
+		<div style="width:100vw;height:100vh" onclick="clickCanvas()">
+			<canvas id="mycanvas" style="width:100vw;margin:0 auto" ></canvas>
+		</div>
+
+		<script>
+			var canvas = document.getElementById('mycanvas');
+			
+			var scrX = 1200; var scrY = 600; 			
+			canvas.width = scrX; canvas.height = scrY;
+			
+			var ctx = canvas.getContext('2d');
+
+			var rad = 20; //Radius des Balls
+			var ball = { x: scrX/2, y: scrY/2 }; // Position des Balls; Zu Beginn in der Bildmitte
+
+			var moveX = 24; // Schrittgröße Horizontal
+			var moveY = 12; // Schrittgröße Vertikal
+
+			var mode = "horizontal";
+			
+			var count = 0; // Zähler für die Bewegungen, wobei eine beendet ist, wenn der Bildschirmrand erreicht ist. Folglich ist count = amount*2 zum Start des Sets nach EMDR-Definition
+			
+			// Zu Programmierzwecken. Um die Zeit von Anfang bis Ende zu messen
+			var timeStart = 0; var timeEnde = 0;
+			
+			var speed = 10; // Angabe in ms
+			var amount = 10; // Anzahl der Bewegungen nach EMDR, d.h. hin UND zurück
+			
+			var color = "#f542a7";
+			var bgcolor = "#a1ecff";
+			
+			changeVal(); // Nötig, um Werte, die im Browser gespeichert sind, auch in die Variablen zu übernehmen
+
+			
+			/*************************************************************
+			Liefert die ausgewählte Bewegungsrichtung
+			**************************************************************/
+			function getMode(){				
+				if (document.getElementById("m1").checked){mode=document.getElementById("m1").value}
+				else if (document.getElementById("m2").checked){mode=document.getElementById("m2").value}
+				else if (document.getElementById("m3").checked){mode=""}
+				else mode="horizontal";
+			}
+			
+			
+			/*************************************************************
+			Wird aufgerufen, wenn der "Einstellungen"-Button gedrückt wird.	Der Einstellungsbereich wird dadurch ein- oder ausgeblendet.
+			**************************************************************/
+			function toggleSettings(){
+				r = document.getElementById("steuerung").style.right;
+				
+				if (r != "-300px") {document.getElementById("steuerung").style.right = "-300";} else {
+					document.getElementById("steuerung").style.right = "10";
+					clearInterval(moving);
+				}				
+			}
+			
+			
+			/*************************************************************
+			Lädt die Einstellungen in die entsprechenden Variablen und umgekehrt, wenn man die Seite neu lädt und der Browser die
+			Vorwerte automatisch ausfüllt (was einige tun)
+			**************************************************************/
+			function changeVal(){
+				speed = parseInt(document.getElementById("speed").value);
+				document.getElementById("speedVal").innerHTML = (Math.round(1000/(speed*10))/10) ;
+				
+				amount = parseInt(document.getElementById("amount").value);
+				document.getElementById("amountVal").innerHTML = amount ;
+				
+				rad = parseInt(document.getElementById("radius").value);
+				document.getElementById("radiusVal").innerHTML = rad ;
+				
+				color = document.getElementById("dotcolor").value;
+				
+				bgcolor = document.getElementById("bgcolor").value;
+				document.body.style.backgroundColor = bgcolor;
+				
+				getMode();
+				
+				// Geschwindigkeit anpassen, wenn ein Set gerade läuft
+				if (count>0) {
+					clearInterval(moving);
+					moving = setInterval(Animation, speed);
+				}
+				
+				paintBall();
+			}
+
+
+			/*************************************************
+			Eine laufende Bewegung (lt. EMDR "Set") wird beendet oder, wenn kein gerade läuft, eine neue gestartet
+			**************************************************/
+			function clickCanvas(){
+				if (count > 0) {
+					count = 0;
+					clearInterval(moving);
+					
+					ball = { x: scrX/2, y: scrY/2 }; // Start in der Bildmitte
+					paintBall();
+				} else applySettings();
+			}
+			
+			
+			/*************************************************
+			Startet eine neue Animation
+			**************************************************/
+			function applySettings(){
+				ball = { x: scrX/2, y: scrY/2 }; // Start in der Bildmitte
+				
+				var speed = parseInt(document.getElementById("speed").value);
+				count = (parseInt(document.getElementById("amount").value) ) * 2;
+				
+				clearInterval(moving)
+				timeStart = Date.now();
+				moving = setInterval(Animation, speed);
+				
+			}
+
+			
+			/*************************************************
+			Leert die Zeichenfläche und zeichnet den Ball. Dabei sind die Koordinaten: ball.x und ball.y (global)
+			**************************************************/
+			function paintBall(){
+				ctx.clearRect(0, 0, scrX, scrY); // Feld leeren
+				
+				// Ball zeichnen
+				ctx.beginPath();
+				ctx.fillStyle = color;
+				ctx.arc(ball.x, ball.y, rad, 0, Math.PI * 2, true);
+				ctx.fill();						
+				ctx.closePath();
+			}
+			
+			
+			/*************************************************
+			Steuert die Animation
+			**************************************************/
+			function Animation() {
+
+				// Änderung der Bewegungsrichtung, wenn der Bildrand erreicht ist. Zudem ist dann eine (halbe) Bewegung (entsprechend EMDR) beendet, deswegen "count" vermindert
+				if (ball.x > canvas.width - rad || ball.x < rad) {
+					moveX = -moveX;
+					if (mode=="horizontal" || mode=="") count--;
+				}
+				if (ball.y > canvas.height - rad || ball.y < rad) {
+					moveY = -moveY;
+					if (mode == "vertical") count--;
+				}
+				
+				// Zu Programmierzwecken
+				console.clear(); console.log(ball.x + ","+ball.y); console.log(count);
+
+				/***********************************************************
+				Hier wird die Bewegung erzeugt und/oder die Animation beendet.
+				Dabei wird die Animation der "horizontalen" und "vertikalen" Bewegung erst in der Bildmitte beendet (wie in EMDR vorgesehen)
+				************************************************************/
+				switch (mode) {
+					case 'horizontal':
+						ball.x += moveX;						
+						if (count <= 0 && ball.x > (scrX/2)-moveX && ball.x < (scrX/2)+moveX) {clearInterval(moving)}
+						break;
+					case 'vertical':
+						ball.y += moveY;
+						if (count <= 0 && ball.y < (scrY/2)-moveY && ball.y > (scrY/2)+moveY) {clearInterval(moving)}
+						break;
+					default:
+						ball.x += moveX;
+						ball.y += moveY;
+						if (count<0) {clearInterval(moving);ball = { x: scrX/2, y: scrY/2 };}
+				}
+				
+				paintBall(); // Ball zeichnen
+				
+				// Anzeige der Zeitmessung in der Konsole; Zu Programmierzwecken
+				if (count <= 0) {timeEnde = Date.now(); console.log((timeStart-timeEnde)/1000);}
+								
+			}
+			
+			/***********************************************************
+			Umschalten zu Vollbild und umgekehrt
+			************************************************************/
+			function FullScreen() {
+				var elem = document.documentElement;				
+				if (!window.screenTop && !window.screenY) {
+					document.exitFullscreen();
+				} else {
+					elem.requestFullscreen();
+				}
+			}
+			
+			var moving; // Variable für das Animations-Intervall
+
+		</script>
+	</body>
+</html>
