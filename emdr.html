@@ -62,7 +62,6 @@ SOFTWARE.
 		}
 		
 		.option {
-			border: 1px solid gray;
 			width: 200px;
 			margin: 0 auto 1em;
 			padding: 0.5em;
@@ -74,22 +73,22 @@ SOFTWARE.
 		}
 
 		.button { /* Einstellung-Button */
-			box-shadow:inset 0px 1px 0px 0px #ffffff;
-			background:linear-gradient(to bottom, #ffffff 5%, #f6f6f6 100%);
-			background-color:#ffffff;
-			border-radius:6px;
-			border:1px solid #dcdcdc;
-			display:inline-block;
-			cursor:pointer;
-			color:#666666;
-			font-size:1em;
-			padding:6px 24px;
-			text-decoration:none;
-			text-shadow:0px 1px 0px #ffffff;
-			position:fixed;
-			bottom:40px;
-			right:10px;
+
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 15px;
+  background: #c4c9cc;
+  padding: 5px 13px 5px 13px;
+  text-decoration: none;
+  cursor:pointer;
+			position:fixed;bottom:40px;right:10px;
 		}
+		
+		.button:hover {
+  
+  background: #b3b9bd;
+  text-decoration: none;
+}
 		
 		.fullscreenBtn {
 			position:fixed;
@@ -106,32 +105,15 @@ SOFTWARE.
 			background-color:white
 		}
 		
-		/* Auswahlbox Animationsrichtung */
-		.mode input[type="radio"] {
-			clip: rect(0 0 0 0);
-			clip-path: inset(50%);
-			height: 1px;
-			overflow: hidden;
-			position: absolute;
-			white-space: nowrap;
-			width: 10px;
-		}
-
-		.mode label {
-			border: 1px solid #333;
-			padding: 1px;
-		}
- 
-		.mode input:checked + label {
-			background: #ebf5d7;
-			color: #5a9900;
-			box-shadow: none;
-		}
-
-		 input:hover + label,
-		 input:focus + label {
-			background: #ffebe6; 
-		}
+		select {
+			border: 3px solid #e7e7e7;
+			padding: 2px 0px;
+			text-align: center;
+			border-radius: 6px;
+			font-size:1em;
+			color: #000;
+			margin: 0px 6px;
+		}		
 	</style>
 	<body >
 		
@@ -145,7 +127,7 @@ SOFTWARE.
 			</div>
 			
 			<div class="option">
-				Geschwindigkeit: <span id="speedVal">1</span> Hz<br><input type="range" min="1" max="20" step="1.0" value="10" id="speed" oninput="changeVal()">
+				Geschwindigkeit: <span id="speedVal">1</span> Hz<br><input type="range" min="2" max="38" step="2.0" value="10" id="speed" oninput="changeVal()">
 			</div>
 			
 			<div class="option">
@@ -153,17 +135,21 @@ SOFTWARE.
 			</div>
 			
 			<div class="option">
-				Farbe: <input type="color" value="#f542a7" id="dotcolor" oninput="changeVal()" style="height:20px">
+				Farbe: <input type="color" value="#F66151" id="dotcolor" oninput="changeVal()" style="height:20px">
 			</div>
 			
 			<div class="option">
-				Hintergrund: <input type="color" value="#a1ecff" id="bgcolor" oninput="changeVal()" style="height:20px">
+				Hintergrund: <input type="color" value="#F6F5F4" id="bgcolor" oninput="changeVal()" style="height:20px">
 			</div>
 			
-			<div class="option mode" onclick="getMode()"> Richtung:
-				<input type="radio" id="m1" name="mode" value="horizontal"><label for="m1">&#8596;</label>
-				<input type="radio" id="m2" name="mode" value="vertical"><label for="m2">&varr;</label>
-				<input type="radio" id="m3" name="mode" value="diagonal"><label for="m3">&#8601;</label>				
+			<div class="option">
+				Richtung: 
+				<select id="mode" onchange="getMode()" autocomplete='off'>					
+					<option value="horizontal" selected="selected">Horizontal</option>
+					<option value="vertical">Vertikal</option>
+					<option value="diagonal">Diagonal</option>
+				</select>
+				
 			</div>
 			
 		</div>
@@ -198,8 +184,9 @@ SOFTWARE.
 			var rad = 20; //Radius des Balls
 			var ball = { x: scrX/2, y: scrY/2 }; // Position des Balls; Zu Beginn in der Bildmitte
 
-			var moveX = 24; // Schrittgröße Horizontal
-			var moveY = 12; // Schrittgröße Vertikal
+			// Die Basisgrößen (baseX,baseY) werden benötigt, um später die Animationsfrequenz mit der Schrittgröße anzupassen
+			var baseX = moveX = 24; // Schrittgröße Horizontal
+			var baseY = moveY = 12; // Schrittgröße Vertikal
 
 			var mode = "horizontal";
 			
@@ -209,22 +196,46 @@ SOFTWARE.
 			var timeStart = 0; var timeEnde = 0;
 			
 			var speed = 10; // Angabe in ms
+			
+			var speedFraction = 1; // Die Animationsgeschwindigkeit (speed) wird durch diesen Factor geteilt und die Schrittgröße damit multipliziert
+			
 			var amount = 10; // Anzahl der Bewegungen nach EMDR, d.h. hin UND zurück
 			
-			var color = "#f542a7";
-			var bgcolor = "#a1ecff";
+			var color = "#F66151";
+			var bgcolor = "#F6F5F4";
 			
 			changeVal(); // Nötig, um Werte, die im Browser gespeichert sind, auch in die Variablen zu übernehmen
 
+
+			/*************************************************************
+			Passt die Schrittgröße der Ballbewegung an die Animationsfrequenz an, sodass die Bewegung bei langsamer Geschwindigkeit fließender
+			animiert werden kann. Bei hoher Bewegungsfrequenz müssen die Schritte größer werden, sonst dauert es zu lange.
+			**************************************************************/
+			function setSpeedFraction(){
+				if (speed < 10) {
+					speedFraction = 1;
+				} else if (speed < 20) {
+					speedFraction = 2;
+				} else if (speed < 30) {
+					speedFraction = 3;
+				} else speedFraction = 4;
+				
+				moveX = baseX / speedFraction
+				moveY = baseY / speedFraction				
+			}
+			
 			
 			/*************************************************************
 			Liefert die ausgewählte Bewegungsrichtung
 			**************************************************************/
-			function getMode(){				
+			function getMode(){
+				
+				mode = document.getElementById("mode").value;
+				/*
 				if (document.getElementById("m1").checked){mode=document.getElementById("m1").value}
 				else if (document.getElementById("m2").checked){mode=document.getElementById("m2").value}
 				else if (document.getElementById("m3").checked){mode=""}
-				else mode="horizontal";
+				else mode="horizontal";*/
 			}
 			
 			
@@ -245,7 +256,7 @@ SOFTWARE.
 			Lädt die Einstellungen in die entsprechenden Variablen und umgekehrt, wenn man die Seite neu lädt und der Browser die
 			Vorwerte automatisch ausfüllt (was einige tun)
 			**************************************************************/
-			function changeVal(){
+			function changeVal(){				
 				speed = parseInt(document.getElementById("speed").value);
 				document.getElementById("speedVal").innerHTML = (Math.round(1000/(speed*10))/10) ;
 				
@@ -262,10 +273,12 @@ SOFTWARE.
 				
 				getMode();
 				
+				setSpeedFraction();
+				
 				// Geschwindigkeit anpassen, wenn ein Set gerade läuft
 				if (count>0) {
 					clearInterval(moving);
-					moving = setInterval(Animation, speed);
+					moving = setInterval(Animation, speed / speedFraction);
 				}
 				
 				paintBall();
@@ -297,7 +310,7 @@ SOFTWARE.
 				
 				clearInterval(moving)
 				timeStart = Date.now();
-				moving = setInterval(Animation, speed);
+				moving = setInterval(Animation, speed / speedFraction);
 				
 			}
 

@@ -35,6 +35,7 @@ Es gibt viele weitere Webanwendungen (jeweils mit Vor- und Nachteilen), die auch
 * [https://github.com/hosteren/EMDR-for-browsers](https://github.com/hosteren/EMDR-for-browsers)
 * [https://github.com/svaponi/emdr-therapy-webapp](https://github.com/svaponi/emdr-therapy-webapp)
 * [https://github.com/sarayourfriend/emdr-lightbar](https://github.com/sarayourfriend/emdr-lightbar)
+* Übersichtseite: [https://github.com/topics/emdr](https://github.com/topics/emdr)
 
 
 
