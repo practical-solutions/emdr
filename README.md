@@ -1,6 +1,6 @@
 ﻿# EMDR-Werkzeug für Computer und Mobilgeräte
 
-> Eye Movement Desensitization and Reprocessing ist ein Methode in der Psychotherapie
+> Eye Movement Desensitization and Reprocessing ist ein Methode in der Psychotherapie. Dieses Programm kann von entsprechend ausgebildeten Personen verwendet werden, wenn sie es für sinnvoll halten.
 
 ## Wie benutze ich das Programm?
 Das Programm besteht aus einer einzigen HTML-Datei. Eine HTML-Datei ist eine Website, die von jedem Internet-Browser (z.B. Chrome, Firefox, Edge, Safari) gelesen werden kann, auch auf Mobilgeräten.
