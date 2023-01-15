@@ -15,6 +15,8 @@ Es ist wirklich nicht schwer, das Programm auszuführen. Wenn man es aber nicht 
 ## Was kann das Programm?
 Das Programm zeigt einen Punkt, der sich horizontal, vertikal oder diagonal über dem Bildschirm bewegt. Einige Eigenschaften, z.B. die Geschwindigkeit oder Anzahl der Wiederholungen, können eingestellt werden. Man kann es für Therapien wie EMDR einsetzen, wenn man es für praktikabel erachtet. 
 
+![Screenshot](screenshot.png)
+
 Man kann es vor Ort verwenden, mittels Bildschirm oder Laptop. Man kann es auch über Videokonferenz verwenden, in dem man für die "Sets" seinen Bildschirm für die Augenbewegungen freigibt. Das sollte man vorher testen.
 
 ## Ist das Programm kostenlos nutzbar?
