@@ -21,17 +21,21 @@ Man kann es vor Ort verwenden, mittels Bildschirm oder Laptop. Man kann es auch 
 Ja, ausdrücklich, auch für kommerzielle Zwecke. Man darf es auch weitergeben.
 
 ## Wie ist dieses Programm entstanden?
-Das Programm habe ich in zwei Tagen geschrieben. Und zwar während meine Frau die Fortbildung zu EMDR gemacht hat und ich mitbekommen habe, dass verschiedene Anwendungen für viele Geld verkauft werden, die nichts als bewegende Punkte darstellen. Also habe ich ihr das Programm geschrieben und gleichzeitig hier als freie Software veröffentlicht.
+Das Programm habe ich in zwei Tagen geschrieben. Und zwar während meine Frau die Fortbildung zu EMDR gemacht hat und ich mitbekommen habe, dass verschiedene Anwendungen für viel Geld verkauft werden, die nichts als bewegende Punkte darstellen. Also habe ich ihr das Programm geschrieben und gleichzeitig hier als freie Software veröffentlicht. Erst danach habe ich gesehen, dass es schon einige ähnliche Programme gibt (s.u.). Alle unterscheiden sich etwas.
 
 ## Wie sieht es mit Updates aus?
-Ich habe das Programm als HTML-Datei konzipiert, da es sehr stabil und plattformübergreifend ist. Updates werde ich schreiben, wenn ich Lust dazu habe. Jeder, der eine Idee hat, kann hier bei GitHub gerne mitarbeiten.
+Ich habe das Programm als HTML-Datei konzipiert, da es sehr stabil und plattformübergreifend ist. Updates werde ich schreiben, wenn ich Lust dazu habe. Jeder, der eine Idee hat, kann hier bei GitHub gerne mitarbeiten. Ich habe den Code einfach gehalten und kommentiert.
 
 ## Und es gibt mehr
 Es gibt viele weitere Webanwendungen (jeweils mit Vor- und Nachteilen), die auch hier auf GitHub zu finden sind. Hier einige Beispiele:
 
+* [https://emdr.mfriedrich.win/](https://emdr.mfriedrich.win/)
+* [https://github.com/QrnaJnyynpr/EMDR](https://github.com/QrnaJnyynpr/EMDR)
+* [https://github.com/Arrvi/remote-emdr](https://github.com/Arrvi/remote-emdr)
 * [https://github.com/hosteren/EMDR-for-browsers](https://github.com/hosteren/EMDR-for-browsers)
 * [https://github.com/svaponi/emdr-therapy-webapp](https://github.com/svaponi/emdr-therapy-webapp)
 * [https://github.com/sarayourfriend/emdr-lightbar](https://github.com/sarayourfriend/emdr-lightbar)
+
 
 
 
